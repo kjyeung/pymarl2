@@ -31,4 +31,4 @@ td_lambda: 0.6 # 0.3 for 6h_vs_8z
 optimizer: 'adam'
 q_lambda: False
 
-name: "qmix_env=8_adam_td_lambda"
+name: "qmix_50m"

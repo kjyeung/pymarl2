@@ -22,4 +22,4 @@ double_q: True
 mixer: # Mixer becomes None
 optimizer: "adam"
 
-name: "iql_env=8_adam"
+name: "iql_50m"
