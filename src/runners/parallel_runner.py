@@ -55,7 +55,7 @@ class ParallelRunner:
         return self.env_info
 
     def save_replay(self):
-        pass
+        self.parent_conns[0].send(("save_replay", None))
 
     def close_env(self):
         for parent_conn in self.parent_conns:
@@ -98,7 +98,6 @@ class ParallelRunner:
         
         save_probs = getattr(self.args, "save_probs", False)
         while True:
-
             # Pass the entire batch of experiences up till now to the agents
             # Receive the actions for each agent at this timestep in a batch for each un-terminated env
             if save_probs:
@@ -208,7 +207,7 @@ class ParallelRunner:
                 self.logger.log_stat("epsilon", self.mac.action_selector.epsilon, self.t_env)
             self.log_train_stats_t = self.t_env
 
-        return self.batch
+        return self.batch, cur_stats
 
     def _log(self, returns, stats, prefix):
         self.logger.log_stat(prefix + "return_mean", np.mean(returns), self.t_env)
@@ -259,6 +258,8 @@ def env_worker(remote, env_fn):
             remote.send(env.get_env_info())
         elif cmd == "get_stats":
             remote.send(env.get_stats())
+        elif cmd == "save_replay":
+            remote.send(env.save_replay())
         else:
             raise NotImplementedError
 

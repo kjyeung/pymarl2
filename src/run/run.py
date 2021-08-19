@@ -33,11 +33,11 @@ def run(_run, _config, _log):
     # setup loggers
     logger = Logger(_log)
 
-    _log.info("Experiment Parameters:")
-    experiment_params = pprint.pformat(_config,
-                                       indent=4,
-                                       width=1)
-    _log.info("\n\n" + experiment_params + "\n")
+    # _log.info("Experiment Parameters:")
+    # experiment_params = pprint.pformat(_config,
+    #                                    indent=4,
+    #                                    width=1)
+    # _log.info("\n\n" + experiment_params + "\n")
 
     # configure tensorboard logger
     unique_token = "{}__{}".format(args.name, datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
@@ -71,10 +71,18 @@ def run(_run, _config, _log):
 
 def evaluate_sequential(args, runner):
 
-    for _ in range(args.test_nepisode):
-        runner.run(test_mode=True)
+    for index in range(args.test_nepisode):
+        # print("Testing: episode {}".format(index+1))
+        _, stats = runner.run(test_mode=True)
+        if len(stats.keys()):
+            print("Current:{}, Win:{}, Win rate: {}%".format(stats['n_episodes'],
+                                                             stats['battle_won'],float(stats['battle_won'])/stats['n_episodes'] * 100))
+            if (stats['n_episodes'] - stats['battle_won']) > 9:
+                print("Win rate low. Break.")
+                break
 
     if args.save_replay:
+        print("saving replay")
         runner.save_replay()
 
     runner.close_env()
